@@ -1,0 +1,8 @@
+[api]
+endpoint = C6623218E8464154379966D718F12
+base_path = /calendars
+
+[calendars]
+urls =
+    https://calendar.google.com/calendar/ical/primary%40gmail.com/public/basic.ics
+    webcal://p62-caldav.icloud.com/published/2/somerandomstring
