@@ -4,6 +4,8 @@ import requests
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from io import BytesIO
+from datetime import datetime, timedelta
+from threading import Lock
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -58,11 +60,27 @@ def merge_calendars(urls):
                     merged_calendar.add_component(component)
     return merged_calendar
 
+# In-memory cache variables
+_cached_calendar_bytes = None
+_cached_timestamp = None
+_cache_lock = Lock()
+CACHE_DURATION = timedelta(minutes=15)
+
 @app.get(f"/{endpoint}/cal.ics", response_class=StreamingResponse)
 def get_merged_calendar():
-    urls = get_calendar_urls()
-    merged_calendar = merge_calendars(urls)
-    ics_bytes = merged_calendar.to_ical()
+    global _cached_calendar_bytes, _cached_timestamp
+
+    with _cache_lock:
+        now = datetime.utcnow()
+        if _cached_calendar_bytes and _cached_timestamp and (now - _cached_timestamp < CACHE_DURATION):
+            ics_bytes = _cached_calendar_bytes
+        else:
+            urls = get_calendar_urls()
+            merged_calendar = merge_calendars(urls)
+            ics_bytes = merged_calendar.to_ical()
+            _cached_calendar_bytes = ics_bytes
+            _cached_timestamp = now
+
     return StreamingResponse(BytesIO(ics_bytes), media_type="text/calendar", headers={
         "Content-Disposition": "attachment; filename=merged_calendar.ics"
     })
