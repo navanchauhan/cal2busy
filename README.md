@@ -1,8 +1,8 @@
-# Busy2Cal
+# Cal2Busy
 
 Have you ever wanted to share your busy schedule with others, but found yourself juggling too many different calendar apps? Maybe you use iCloud and would have to share each calendar individually.
 
-Busy2Cal is a dead simple API service that merges all your calendars into a single iCalendar file endpoint. All events are titled “Busy.”
+Cal2Busy is a dead simple API service that merges all your calendars into a single iCalendar file endpoint. All events are titled “Busy.”
 
 ## Usage
 
